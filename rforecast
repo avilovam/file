@@ -1,33 +1,13 @@
 server {
     listen 80;
-    server_name rforecast.icu www.rforecast.icu;
-    
-    # Перенаправляем HTTP на HTTPS
-    return 301 https://$server_name$request_uri;
-}
+    server_name rforecast.icu;
 
-server {
-    listen 443 ssl;
-    server_name rforecast.icu www.rforecast.icu;
-    
-    # Отключаем показ версии nginx
-    server_tokens off;
+    access_log /var/log/nginx/rforecast.access.log;
+    error_log /var/log/nginx/rforecast.error.log;
 
     location / {
         proxy_pass http://127.0.0.1:443;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Добавляем заголовки для WebSocket
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
-
-    # Запрещаем доступ к скрытым файлам
-    location ~ /\. {
-        deny all;
     }
 }
